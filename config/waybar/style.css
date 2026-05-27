@@ -1,0 +1,126 @@
+@import "../omarchy/current/theme/waybar.css";
+
+* {
+  background-color: @background;
+  color: @foreground;
+
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  font-family: 'JetBrainsMono Nerd Font';
+  font-size: 13px;
+}
+
+.modules-left {
+  margin-left: 6px;
+}
+
+.modules-right {
+  margin-right: 6px;
+}
+
+/* Workspace buttons — explicit GTK resets instead of all:initial so color overrides work */
+#workspaces button {
+  padding: 3px 8px;
+  margin: 3px 2px;
+  font-family: 'JetBrainsMono Nerd Font';
+  font-size: 13px;
+  color: #b8d4e8;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  box-shadow: none;
+  text-shadow: none;
+  outline: none;
+}
+
+#workspaces button.empty {
+  opacity: 0.4;
+}
+
+#workspaces button.active {
+  background: #00dce8;
+  color: #ffffff;
+  border-radius: 5px;
+}
+
+#workspaces button.active * {
+  background: transparent;
+  color: transparent;
+}
+
+/* Clock — warm gold to catch the eye */
+#clock {
+  color: #e8c858;
+  margin-left: 6px;
+  margin-right: 0;
+}
+
+/* Separator between clock and weather */
+#custom-weather-detail {
+  border-left: 1px solid rgba(184, 212, 232, 0.2);
+  padding-left: 16px;
+  margin-left: 16px;
+}
+
+#cpu,
+#battery,
+#pulseaudio,
+#custom-omarchy,
+#custom-update {
+  min-width: 12px;
+  margin: 0 5px;
+}
+
+#tray {
+  margin-right: 10px;
+  margin-left: 8px;
+}
+
+#bluetooth {
+  margin-right: 12px;
+}
+
+#network {
+  margin-right: 9px;
+}
+
+tooltip {
+  padding: 2px;
+}
+
+#custom-update {
+  font-size: 11px;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+#custom-screenrecording-indicator,
+#custom-idle-indicator,
+#custom-notification-silencing-indicator {
+  min-width: 12px;
+  margin-left: 4px;
+  margin-right: 0;
+  font-size: 11px;
+  padding-bottom: 1px;
+}
+
+#custom-screenrecording-indicator.active {
+  color: #d05060;
+}
+
+#custom-idle-indicator.active,
+#custom-notification-silencing-indicator.active {
+  color: #d05060;
+}
+
+#custom-voxtype {
+  min-width: 12px;
+  margin: 0 0 0 5px;
+}
+
+#custom-voxtype.recording {
+  color: #d05060;
+}

@@ -1,0 +1,72 @@
+# Omarchy-managed (symlink, changes with theme switches)
+config/omarchy/current/
+
+# Credentials and secrets
+*.pem
+*.key
+*.p12
+*.pfx
+**/*id_rsa*
+**/*id_ed25519*
+**/*id_ecdsa*
+**/*id_dsa*
+**/.ssh/
+**/known_hosts
+**/*token*
+**/*secret*
+**/*password*
+**/*credential*
+**/*.env
+**/.env.*
+!**/.env.example
+
+# Claude Code local settings (machine-specific permission grants)
+.claude/settings.local.json
+
+# Cache and generated junk
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/Cache/
+**/cache/
+**/*.log
+**/*.tmp
+**/*.bak*
+**/*.backup
+**/*.swap
+**/*.swo
+**/*.swp
+.DS_Store
+Thumbs.db
+
+# Browser data
+**/chromium/Default/
+**/chromium/*/Cache/
+**/chromium/*/Code Cache/
+**/chromium/*/Session Storage/
+**/chromium/*/Local Storage/
+**/chromium/*/IndexedDB/
+**/chromium/*/GPUCache/
+**/chromium/*/Cookies
+**/chromium/*/History
+**/chromium/*/Login Data
+
+# Neovim lazy plugin lockfile (machine-specific)
+config/nvim/lazy-lock.json
+
+# Large/binary
+*.so
+*.dylib
+*.dll
+*.o
+*.a
+*.iso
+*.img
+*.mp4
+*.mp3
+*.mkv
+*.avi
+
+# Node
+node_modules/
+.npm/
