@@ -1,6 +1,6 @@
 # dotfiles
 
-Personal configuration for an [Omarchy](https://omarchy.org) desktop on Arch Linux. Covers Hyprland overrides, a custom Waybar layout, the arctic-ocean theme, and a few quality-of-life hooks.
+Personal configuration for an [Omarchy](https://omarchy.org) desktop on Arch Linux. Covers Hyprland overrides, a custom Waybar layout, the deep-space theme, and a few quality-of-life hooks.
 
 ## Prerequisites
 
@@ -21,7 +21,7 @@ bash install.sh
 After installation, apply the theme:
 
 ```bash
-omarchy-theme-set arctic-ocean
+omarchy-theme-set deep-space
 ```
 
 ## What's included
@@ -30,7 +30,7 @@ omarchy-theme-set arctic-ocean
 
 **Waybar** — custom bar layout with date/time on the left, workspaces centered, and system indicators on the right. Includes a weather module powered by [Open-Meteo](https://open-meteo.com) (no API key required) using IP-based geolocation.
 
-**arctic-ocean theme** — dark midnight-blue base with a cyan accent. Covers terminal colors, Hyprland borders, btop, Waybar, and Neovim. Background images cycle on login and lock — drop additional images into `config/omarchy/themes/arctic-ocean/backgrounds/` and re-run `omarchy-theme-set arctic-ocean` to register them.
+**deep-space theme** — dark midnight-blue base with a cyan accent. Covers terminal colors, Hyprland borders, btop, Waybar, and Neovim. Background images cycle on login and lock — drop additional images into `config/omarchy/themes/deep-space/backgrounds/` and re-run `omarchy-theme-set deep-space` to register them.
 
 **Omarchy hooks** — background cycling on session start and screen lock. No wallpaper changes during an active session.
 

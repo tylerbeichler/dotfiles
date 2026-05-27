@@ -13,7 +13,7 @@ dotfiles/
 │   │   ├── branding/  # Custom branding assets
 │   │   ├── extensions/
 │   │   ├── hooks/     # Lifecycle hooks (post-boot, theme-set, etc.)
-│   │   └── themes/    # Custom themes — arctic-ocean is the current theme
+│   │   └── themes/    # Custom themes — deep-space is the current theme
 │   └── waybar/        # Waybar config, style, and custom module scripts
 └── install.sh         # Bootstraps symlinks: dotfiles/X → ~/.X
 ```
