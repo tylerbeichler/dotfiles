@@ -27,9 +27,12 @@ link config/omarchy/hooks      .config/omarchy/hooks
 link config/omarchy/themes     .config/omarchy/themes
 
 # Claude Code config
-link .claude/commands     .claude/commands
+link .claude/commands         .claude/commands
 link .claude/settings.json    .claude/settings.json
 link .claude/keybindings.json .claude/keybindings.json
+
+# Session environment (also prepends ~/dotfiles/bin to PATH for user script overrides)
+link config/uwsm/default .config/uwsm/default
 
 # App configs — uncomment as you add them to the repo
 link config/waybar     .config/waybar

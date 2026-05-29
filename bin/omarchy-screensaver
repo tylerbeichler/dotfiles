@@ -1,0 +1,142 @@
+#!/bin/bash
+
+# Per-monitor screensaver: geometric pattern on sides, live data on center (DP-1).
+
+screensaver_in_focus() {
+  hyprctl activewindow -j | jq -e '.class == "org.omarchy.screensaver"' >/dev/null 2>&1
+}
+
+exit_screensaver() {
+  hyprctl keyword cursor:invisible false &>/dev/null || true
+  pkill -x tte 2>/dev/null
+  pkill -f org.omarchy.screensaver 2>/dev/null
+  exit 0
+}
+
+trap exit_screensaver SIGINT SIGTERM SIGHUP SIGQUIT
+
+printf '\033]11;rgb:00/00/00\007'
+hyprctl keyword cursor:invisible true &>/dev/null
+
+tty=$(tty 2>/dev/null)
+
+# Detect monitor via parent Alacritty PID — needs a moment for the window to register
+sleep 0.5
+monitor_id=$(hyprctl clients -j | jq -r ".[] | select(.pid == $PPID) | .monitor" 2>/dev/null)
+monitor_name=$(hyprctl monitors -j | jq -r ".[] | select(.id == $monitor_id) | .name" 2>/dev/null)
+
+run_tte() {
+  tte -i "$1" \
+    --frame-rate 120 --canvas-width 0 --canvas-height 0 \
+    --reuse-canvas --anchor-canvas c --anchor-text c \
+    --random-effect --no-eol --no-restore-cursor &
+}
+
+wait_for_tte() {
+  while pgrep -t "${tty#/dev/}" -x tte >/dev/null; do
+    if read -n1 -t 1 || ! screensaver_in_focus; then
+      exit_screensaver
+    fi
+  done
+}
+
+# ---------------------------------------------------------------------------
+# Weather — fetched once per screensaver session, cached in variables
+# ---------------------------------------------------------------------------
+_w_fetched=0
+_w_temp="--" _w_humidity="--" _w_line="--"
+
+fetch_weather() {
+  [[ $_w_fetched -eq 1 ]] && return
+  local geo coords lat lon data precip wcode desc pmm pin
+  geo=$(curl -fsS --max-time 3 "https://ipinfo.io" 2>/dev/null) || return
+  coords=$(echo "$geo" | jq -r '.loc')
+  lat=$(echo "$coords" | cut -d',' -f1)
+  lon=$(echo "$coords" | cut -d',' -f2)
+  data=$(curl -fsS --max-time 5 \
+    "https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code&temperature_unit=fahrenheit&precipitation_unit=mm" \
+    2>/dev/null) || return
+  _w_temp=$(echo "$data" | jq -r '.current.temperature_2m | round')
+  _w_humidity=$(echo "$data" | jq -r '.current.relative_humidity_2m')
+  precip=$(echo "$data" | jq -r '.current.precipitation')
+  wcode=$(echo "$data" | jq -r '.current.weather_code')
+  case $wcode in
+    0)  desc="Clear sky" ;;     1) desc="Mostly clear" ;;
+    2)  desc="Partly cloudy" ;; 3) desc="Overcast" ;;
+    45|48) desc="Foggy" ;;
+    51) desc="Light drizzle" ;; 53) desc="Drizzle" ;;    55) desc="Heavy drizzle" ;;
+    61) desc="Light rain" ;;    63) desc="Rain" ;;        65) desc="Heavy rain" ;;
+    71) desc="Light snow" ;;    73) desc="Snow" ;;        75) desc="Heavy snow" ;;
+    80) desc="Light showers" ;; 81) desc="Showers" ;;    82) desc="Heavy showers" ;;
+    95) desc="Thunderstorm" ;;  96|99) desc="Hail storm" ;;
+    *)  desc="--" ;;
+  esac
+  case $wcode in
+    51|53|55|56|57|61|63|65|66|67|71|73|75|77|80|81|82|85|86|95|96|99)
+      pmm=$(echo "$precip" | awk '{printf ($1 == int($1)) ? "%dmm" : "%.1fmm", $1}')
+      pin=$(echo "$precip" | awk '{printf "%.2f\"", $1 / 25.4}')
+      _w_line="${desc}  (${pmm} / ${pin})"
+      ;;
+    *) _w_line="$desc" ;;
+  esac
+  _w_fetched=1
+}
+
+# ---------------------------------------------------------------------------
+# Center content generator — called each tte cycle so the clock is live
+# ---------------------------------------------------------------------------
+generate_center() {
+  fetch_weather
+  local dt w row1 row2 row3
+  dt=$(date '+%A  ·  %B %-d  ·  %H:%M')
+  w=45
+  row1=$(printf "%-${w}s" "$dt")
+  row2=$(printf "%-${w}s" "${_w_temp}°  ·  ${_w_humidity}% humidity")
+  row3=$(printf "%-${w}s" "$_w_line")
+  cat <<EOF
+·  ·  ✦  ·  ·  +  ·  ·  ✦  ·  ·  +  ·  ·  ✦  ·  ·
+
+╔═══════════════════════════════════════════════════════╗
+║  ·    ◇    ·    ·    ·    ·    ·    ◇    ·    ·    ║
+║                                                       ║
+║  ┌───────────────────────────────────────────────┐   ║
+║  │  ${row1}  │  ║
+║  └───────────────────────────────────────────────┘   ║
+║                                                       ║
+║  ┌───────────────────────────────────────────────┐   ║
+║  │  ${row2}  │  ║
+║  │  ${row3}  │  ║
+║  └───────────────────────────────────────────────┘   ║
+║                                                       ║
+║  ·  ·  ◦  ·  ·  ·  ◦  ·  ·  ·  ◦  ·  ·  ·  ◦  ·  ║
+║           ╔═══════════════════════════╗               ║
+║           ║  ·    ◇    ·    ◇    ·   ║               ║
+║           ║          ✦               ║               ║
+║           ║  ·    ◇    ·    ◇    ·   ║               ║
+║           ╚═══════════════════════════╝               ║
+║  ·  ·  ◦  ·  ·  ·  ◦  ·  ·  ·  ◦  ·  ·  ·  ◦  ·  ║
+║                                                       ║
+║  ·    ◇    ·    ·    ·    ·    ·    ◇    ·    ·    ║
+╚═══════════════════════════════════════════════════════╝
+
+·  ·  ✦  ·  ·  +  ·  ·  ✦  ·  ·  +  ·  ·  ✦  ·  ·
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# Main loop
+# ---------------------------------------------------------------------------
+if [[ "$monitor_name" == "DP-1" ]]; then
+  while true; do
+    tmpfile=$(mktemp /tmp/screensaver-center.XXXXXX)
+    generate_center > "$tmpfile"
+    run_tte "$tmpfile"
+    rm -f "$tmpfile"
+    wait_for_tte
+  done
+else
+  while true; do
+    run_tte ~/.config/omarchy/branding/screensaver-geo.txt
+    wait_for_tte
+  done
+fi
